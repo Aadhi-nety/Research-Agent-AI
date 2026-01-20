@@ -1,50 +1,90 @@
 'use client'
 
+import React from "react"
+
 import { useState } from 'react'
-import { QueryInput } from '../components/query-input'
+import { Button } from './ui/button'
+import { Textarea } from './ui/textarea'
+import { SearchIcon } from 'lucide-react'
 
-export default function Home() {
-  const [answer, setAnswer] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
+interface QueryInputProps {
+onSubmit: (query: string) => void
+isLoading: boolean
+}
 
-  const handleResearchSubmit = async (query: string) => {
-    setIsLoading(true)
-    setAnswer('')
+export function QueryInput({ onSubmit, isLoading }: QueryInputProps) {
+const [query, setQuery] = useState('')
 
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/research`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query }),
-      })
+const handleSubmit = (e: React.FormEvent) => {
+e.preventDefault()
+if (query.trim()) {
+onSubmit(query)
+setQuery('')
+}
+}
 
-      const data = await res.json()
-      setAnswer(data.answer || 'No answer returned')
-    } catch (err) {
-      console.error(err)
-      setAnswer('Error fetching the answer')
-    }
+return (
+<div className="space-y-4">
+<div className="rounded-lg border border-border bg-card p-6">
+<h2 className="mb-4 text-xl font-semibold text-foreground">
+What would you like to research?
+</h2>
+<form onSubmit={handleSubmit} className="space-y-4">
+<Textarea
+placeholder="Enter your research query... (e.g., 'Analyze the impact of artificial intelligence on healthcare industry')"
+value={query}
+onChange={(e) => setQuery(e.target.value)}
+disabled={isLoading}
+className="min-h-24 resize-none"
+/>
+<div className="flex justify-end">
+<Button
+type="submit"
+disabled={isLoading || !query.trim()}
+className="w-full gap-2 sm:w-auto"
+>
+<SearchIcon className="h-4 w-4" />
+{isLoading ? 'Analyzing...' : 'Research'}
+</Button>
+</div>
+</form>
+</div>
 
-    setIsLoading(false)
-  }
+<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">  
+    <button  
+      onClick={() => setQuery('What are the latest trends in artificial intelligence?')}  
+      disabled={isLoading}  
+      className="rounded-lg border border-border bg-card/50 p-3 text-left text-sm transition-colors hover:bg-card disabled:opacity-50"  
+    >  
+      <p className="font-medium text-foreground">AI Trends</p>  
+      <p className="text-xs text-muted-foreground">Explore latest AI developments</p>  
+    </button>  
+    <button  
+      onClick={() => setQuery('Analyze sustainable energy solutions for 2025')}  
+      disabled={isLoading}  
+      className="rounded-lg border border-border bg-card/50 p-3 text-left text-sm transition-colors hover:bg-card disabled:opacity-50"  
+    >  
+      <p className="font-medium text-foreground">Green Energy</p>  
+      <p className="text-xs text-muted-foreground">Sustainable solutions analysis</p>  
+    </button>  
+    <button  
+      onClick={() => setQuery('Summarize recent breakthroughs in quantum computing')}  
+      disabled={isLoading}  
+      className="rounded-lg border border-border bg-card/50 p-3 text-left text-sm transition-colors hover:bg-card disabled:opacity-50"  
+    >  
+      <p className="font-medium text-foreground">Quantum Computing</p>  
+      <p className="text-xs text-muted-foreground">Latest technical advances</p>  
+    </button>  
+    <button  
+      onClick={() => setQuery('Compare remote work productivity trends across industries')}  
+      disabled={isLoading}  
+      className="rounded-lg border border-border bg-card/50 p-3 text-left text-sm transition-colors hover:bg-card disabled:opacity-50"  
+    >  
+      <p className="font-medium text-foreground">Remote Work</p>  
+      <p className="text-xs text-muted-foreground">Productivity analysis</p>  
+    </button>  
+  </div>  
+</div>
 
-  return (
-    <main className="p-8 space-y-6">
-      <h1 className="text-3xl font-bold">Research Agent</h1>
-      <p className="text-sm text-muted-foreground">
-        Submit any research topic and get a comprehensive analysis with key findings.
-      </p>
-
-      {/* Your input component */}
-      <QueryInput onSubmit={handleResearchSubmit} isLoading={isLoading} />
-
-      {/* Display the answer */}
-      {answer && (
-        <div className="mt-6 p-4 border rounded bg-gray-50">
-          <h2 className="font-semibold text-lg">Answer:</h2>
-          <p className="mt-2">{answer}</p>
-        </div>
-      )}
-    </main>
-  )
+)
 }
