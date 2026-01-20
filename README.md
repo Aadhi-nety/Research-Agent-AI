@@ -1,38 +1,22 @@
 # Research Agent
 
-An AI-powered research and analysis agent that synthesizes information and provides comprehensive insights on any topic.
-
-## Features
-
-- Submit research queries and receive comprehensive analysis
-- Key findings, recommendations, and source citations
-- Powered by free Hugging Face models (no API keys required)
-- Modern Next.js frontend with Tailwind CSS
-- FastAPI backend with CORS support
+A full-stack application for AI-powered research analysis with a FastAPI backend and Next.js frontend.
 
 ## Project Structure
 
 ```
 research-agent/
-├── backend/                 # Python FastAPI backend
-│   ├── main.py             # Main FastAPI application
-│   └── requirements.txt    # Python dependencies
-├── frontend/                # Next.js frontend
-│   ├── app/                # Next.js app directory
-│   ├── components/         # React components
-│   ├── lib/                # Utility functions
-│   └── package.json        # Node.js dependencies
-├── API_SPEC.md             # API documentation
-└── README.md               # This file
+├── backend/          # FastAPI backend
+├── frontend/         # Next.js frontend
+├── .gitignore        # Git ignore rules
+└── README.md         # This file
 ```
 
-## Setup
-
-### Backend
+## Backend Setup
 
 1. Navigate to the backend directory:
    ```bash
-   cd research-agent/backend
+   cd backend
    ```
 
 2. Install dependencies:
@@ -40,18 +24,18 @@ research-agent/
    pip install -r requirements.txt
    ```
 
-3. Run the backend:
+3. Run the server:
    ```bash
    python main.py
    ```
 
-The backend will start on `http://localhost:8000`.
+The backend will be available at `http://localhost:8000`.
 
-### Frontend
+## Frontend Setup
 
 1. Navigate to the frontend directory:
    ```bash
-   cd research-agent/frontend
+   cd frontend
    ```
 
 2. Install dependencies:
@@ -59,59 +43,90 @@ The backend will start on `http://localhost:8000`.
    npm install
    ```
 
-3. Run the frontend:
+3. Run in development mode:
    ```bash
    npm run dev
    ```
 
-The frontend will start on `http://localhost:3000`.
+4. Build for production:
+   ```bash
+   npm run build
+   ```
 
-## Usage
-
-1. Start both backend and frontend as described above.
-2. Open `http://localhost:3000` in your browser.
-3. Enter a research query or click on one of the example buttons.
-4. View the comprehensive analysis results.
-
-## API
-
-The backend provides a single endpoint:
-
-- `POST /analyze` - Analyze a research query
-
-Request body:
-```json
-{
-  "query": "Your research question here"
-}
-```
-
-Response:
-```json
-{
-  "summary": "Comprehensive analysis summary",
-  "key_findings": ["Finding 1", "Finding 2"],
-  "recommendations": ["Recommendation 1", "Recommendation 2"],
-  "sources": ["Source 1", "Source 2"],
-  "analysis_depth": "comprehensive",
-  "confidence_score": 0.85
-}
-```
+The frontend will be available at `http://localhost:3000`.
 
 ## Deployment
 
-### Backend
+### Frontend (Vercel)
 
-Deploy the FastAPI backend to a Python hosting service like Railway, Fly.io, or Render.
+1. Go to [Vercel](https://vercel.com) and sign in.
+2. Click "New Project" and import your GitHub repository.
+3. Set the root directory to `frontend` (or deploy only the frontend folder).
+4. Vercel will detect Next.js and build automatically.
+5. In the project settings, go to "Environment Variables" and add:
+   - Name: `NEXT_PUBLIC_API_URL`
+   - Value: Your deployed backend URL (see below for how to find it)
+6. Deploy the project.
 
-### Frontend
+#### How to Find the NEXT_PUBLIC_API_URL
 
-Deploy the Next.js frontend to Vercel:
+After deploying the backend:
 
-1. Push the code to GitHub.
-2. Connect your repository to Vercel.
-3. Set the `NEXT_PUBLIC_API_URL` environment variable to your deployed backend URL.
+1. Go to your Vercel dashboard.
+2. Click on the backend project.
+3. The URL will be shown at the top (e.g., `https://your-project-name.vercel.app`).
+4. Copy this URL and use it as the value for `NEXT_PUBLIC_API_URL` in the frontend project settings.
+5. If using a different service, use the provided domain.
 
-## License
+### Backend (Vercel)
 
-This project is open source and available under the MIT License.
+1. Create a new Vercel project for the backend.
+2. Set the root directory to `backend`.
+3. Create a `vercel.json` in the backend directory:
+
+```json
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "main.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "main.py"
+    }
+  ]
+}
+```
+
+4. Ensure `requirements.txt` includes all dependencies.
+5. Deploy the backend project to Vercel.
+6. Note the deployed URL (e.g., `https://your-backend.vercel.app`).
+
+### Backend (Alternative: Railway/Render)
+
+For better Python support, consider:
+- **Railway**: Import the `backend` directory, it auto-detects Python.
+- **Render**: Create a web service, set build command to `pip install -r requirements.txt`, start command to `uvicorn main:app --host 0.0.0.0 --port $PORT`.
+
+## Environment Variables
+
+For the frontend, set:
+- `NEXT_PUBLIC_API_URL`: URL of the deployed backend (e.g., `https://your-backend.vercel.app`)
+
+## Troubleshooting
+
+### 404 Error on Vercel
+
+- Ensure you're deploying the `frontend` directory, not the root.
+- Check that `vercel.json` is present in the frontend directory.
+- Verify the build completes successfully before deployment.
+
+### API Connection Issues
+
+- Ensure the backend is deployed and accessible.
+- Check that `NEXT_PUBLIC_API_URL` is set correctly in Vercel environment variables.
+- Verify CORS settings in the backend allow the frontend domain.
